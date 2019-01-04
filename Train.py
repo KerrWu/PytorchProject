@@ -20,12 +20,13 @@ from torch.autograd import Variable
 epoches = 10
 batchSize = 8
 baseLR = 0.01
+
 useReduceLR = True
-useEarlyStop = True
 usePretrainedModel = False
 
 # 如果usePretrainedModel = True， 则需使用该路径导入模型参数，该路径应导向一个pkl文件
 modelPath = '...'
+saveDir = './model'
 
 # 训练数据
 trainTxtPath = './data/train.txt'
@@ -48,6 +49,7 @@ valNum = validData.__len__()
 '''
 
 net = MyNet.MyNet()
+
 if usePretrainedModel:
     net.load(modelPath)
     
@@ -75,6 +77,8 @@ if useReduceLR:
 
 lossFunc = CrossEntropyLoss()
 
+
+maxValAcc = 0
 # 开始训练
 for epoch in range(epoches):
     
@@ -129,9 +133,18 @@ for epoch in range(epoches):
         correctPred += result
 
     valAccu = correctPred/valNum
+    
+    # 当验证集有提升时保存模型参数为pkl文件，注意这里保存参数同时还保存了优化器参数+epoch数目
+    if valAccu>maxValAccu:
+        maxValAccu = valAccu
+        state = {'net':model.state_dict(), 'optimizer':optimizer.state_dict(), 'epoch':epoch }
+        torch.save(state, os.path.join(saveDir, str(epoch)+str(valAccu)+'.pkl'))
+                 
 
     if useReduceLR:
         lrScheduler.step(valAccu)
+        
+        
         
     print("val accuracy = {valAccu}".format(valAccu=valAccu))
         
