@@ -25,6 +25,18 @@ class MyNet(nn.Module):
         self.dropout1 = Dropout(p=0.5)
         
         self.softmax = Softmax()
+
+        for m in self.modules():
+            if isinstance(m, Conv2d):
+                xavier_normal(m.weight.data)
+                if m.bias is not None:
+                    m.bias.data.zero_()
+            elif isinstance(m, BatchNorm2d):
+                m.weight.data.fill_(1)
+                m.bias.data.zero_()
+            elif isinstance(m, Linear):
+                normal(m.weight.data, 0, 0.01)
+                m.bias.data.zero_()
         
     def forward(self,x):
         x = self.conv1(x)
@@ -36,17 +48,17 @@ class MyNet(nn.Module):
         x = self.softmax(x)
         
         return x
-    
-    def initialize_weights(self):
-        for m in self.modules():
-            if isinstance(m, Conv2d):
-                xavier_normal(m.weight.data)
-                if m.bias is not None:
-                    m.bias.data.zero_()
-            elif isinstance(m, BatchNorm2d):
-                m.weight.data.fill_(1)
-                m.bias.data.zero_()
-            elif isinstance(m, Linear):
-                normal(m.weight.data, 0, 0.01)
-                m.bias.data.zero_()              
+
+    # def initialize_weights(self):
+    #     for m in self.modules():
+    #         if isinstance(m, Conv2d):
+    #             xavier_normal(m.weight.data)
+    #             if m.bias is not None:
+    #                 m.bias.data.zero_()
+    #         elif isinstance(m, BatchNorm2d):
+    #             m.weight.data.fill_(1)
+    #             m.bias.data.zero_()
+    #         elif isinstance(m, Linear):
+    #             normal(m.weight.data, 0, 0.01)
+    #             m.bias.data.zero_()
 

@@ -5,6 +5,7 @@
 import os
 import MyDataset
 import MyNet
+import Resnet
 import torch
 import torchvision
 from torch.optim import SGD
@@ -20,9 +21,10 @@ from torch.autograd import Variable
 epoches = 20
 batchSize = 8
 baseLR = 0.01
+num_classes = 5
 
 useReduceLR = True
-usePretrainedModel = True
+usePretrainedModel = False
 saveDir = './model'
 
 # 如果usePretrainedModel = True， 则需使用该路径导入模型参数，该路径应导向一个pkl文件
@@ -46,13 +48,14 @@ valNum = validData.__len__()
 # 创建模型,定义优化器.自动判断是否具有多GPU环境，如果有，默认使用所有GPU
 # 如果有预训练模型，则载入参数，否则用网络中定义的初始化函数初始化变量
 
-net = MyNet.MyNet()
+#net = MyNet.MyNet()
+net = Resnet.resnet18(pretrained=False,num_classes=num_classes)
 optimizer = SGD(net.parameters(), lr=baseLR)
 
 if usePretrainedModel:
     net.load_state_dict(torch.load(modelPath))
-else:
-    net.initialize_weights()
+# else:
+#     net.initialize_weights()
 
 if device_count() > 1:
     print("Find {0} devices in this machine".format(device_count()))
