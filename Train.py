@@ -2,7 +2,7 @@
 # coding: utf-8
 
 # In[1]:
-
+import os
 import MyDataset
 import MyNet
 import torch
@@ -131,7 +131,7 @@ for epoch in range(epoches):
     # 当验证集有提升时保存模型参数为pkl文件，注意这里保存参数同时还保存了优化器参数+epoch数目
     if valAccu>maxValAccu:
         maxValAccu = valAccu
-        state = {'net':model.state_dict(), 'optimizer':optimizer.state_dict(), 'epoch':epoch }
+        state = {'net':net.state_dict(), 'optimizer':optimizer.state_dict(), 'epoch':epoch }
         torch.save(state, os.path.join(saveDir, str(epoch)+str(valAccu)+'.pkl'))
                  
 
