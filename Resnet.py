@@ -6,8 +6,7 @@ import torch.utils.model_zoo as model_zoo
 # 定义conv的封装
 def conv3x3(in_planes, out_planes, stride=1):
     """3x3 convolution with padding"""
-    return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
-                     padding=1, bias=False)
+    return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,padding=1, bias=False)
 
 
 # 定义基础残差块，由两个叠加的3*3卷积核组成，每个卷积操作后进行BN，之后再通过激活函数relu
@@ -68,8 +67,7 @@ class Bottleneck(nn.Module):
         self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=1, bias=False)
         self.bn1 = nn.BatchNorm2d(planes)
 
-        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride,
-                               padding=1, bias=False)
+        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride,padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(planes)
 
         self.conv3 = nn.Conv2d(planes, planes * self.expansion, kernel_size=1, bias=False)
@@ -146,8 +144,7 @@ class ResNet(nn.Module):
         # 下采样通过卷积实现
         if stride != 1 or self.inplanes != planes * block.expansion:
             downsample = nn.Sequential(
-                nn.Conv2d(self.inplanes, planes * block.expansion,
-                          kernel_size=1, stride=stride, bias=False),
+                nn.Conv2d(self.inplanes, planes * block.expansion,kernel_size=1, stride=stride, bias=False),
                 nn.BatchNorm2d(planes * block.expansion),
             )
 
