@@ -16,17 +16,18 @@ from torch.autograd import Variable
 
 
 # In[2]:
-
+#模型参数设置
 epoches = 10
 batchSize = 8
 baseLR = 0.01
 
 useReduceLR = True
 usePretrainedModel = False
+saveDir = './model'
 
 # 如果usePretrainedModel = True， 则需使用该路径导入模型参数，该路径应导向一个pkl文件
-modelPath = '...'
-saveDir = './model'
+if usePretrainedModel:
+    modelPath = '...'
 
 # 训练数据
 trainTxtPath = './data/train.txt'
@@ -42,17 +43,12 @@ validLoader = DataLoader(validData, batch_size=batchSize, shuffle=True, num_work
 valNum = validData.__len__()
 
 
-# In[ ]:
-
-'''
-自动判断是否具有多GPU环境，如果有，默认使用所有GPU
-'''
-
+# 创建模型自动判断是否具有多GPU环境，如果有，默认使用所有GPU
+# 如果有预训练模型，则载入参数，否则用网络中定义的初始化函数初始化变量
 net = MyNet.MyNet()
 
 if usePretrainedModel:
     net.load(modelPath)
-    
 else:
     net.initialize_weights()
 
@@ -67,19 +63,17 @@ else:
     print("can not find any gpu device on this machine, use cpu mode")
 
 
-# In[ ]:
-
+# 定义优化器与损失函数，如果使用学习率减少策略，则定义相关的类
 optimizer = SGD(net.parameters(), lr=baseLR)
 
-#如果使用学习率减少策略，则定义相关的类
 if useReduceLR:
     lrScheduler = ReduceLROnPlateau(optimizer,mode="max",factor=0.8, patience=50, verbose=True,cooldown=10,min_lr=baseLR*0.00001)
 
 lossFunc = CrossEntropyLoss()
 
 
-maxValAcc = 0
 # 开始训练
+maxValAcc = 0
 for epoch in range(epoches):
     
     lossSum = 0
@@ -103,7 +97,7 @@ for epoch in range(epoches):
             labels = Variable(labels)
         
         optimizer.zero_grad()
-        
+
         outputs = net(inputs)
         loss = lossFunc(outputs, labels)
         loss.backward()
@@ -113,7 +107,7 @@ for epoch in range(epoches):
         print("epoch = {epoch}, batch = {batch}/{batchNum}, loss = {loss}".format(epoch=epoch, batch=batch, batchNum=batchNum, loss=loss))
         
         
-    #训练1个epoch后，计算整个valid dataset上的表现,给出val accu，如果使用reduce lr，则由val accu确定是否reduce
+    #训练1个epoch后，计算整个valid dataset上的表现并给出val accu，如果使用reduce lr，则由val accu确定是否reduce
     correctPred = 0
     for vi,vdata in enumerate(validLoader):
 
