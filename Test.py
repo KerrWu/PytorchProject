@@ -2,31 +2,21 @@ import MyDataset
 import MyNet
 import torch
 import torchvision
-from torch.optim import SGD
-from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import DataLoader
-from torch.nn import CrossEntropyLoss,DataParallel
-from torch.cuda import device_count, is_available
+from torch.cuda import is_available
 from torch.autograd import Variable
 
 # 测试参数
-batchSize = 8
 modelPath = "..."
-useMultiGPU = False
 
 # 测试数据
 testTxtPath = './data/test.txt'
 testData = MyDataset.MyDataset(txtPath=testTxtPath, transforms=True, targetTransform='test')
-testLoader = DataLoader(testData, batch_size=batchSize, shuffle=True, num_workers=2, drop_last=False)
-testNum = testData.__len__()
+testLoader = DataLoader(testData, batch_size=1, shuffle=False, num_workers=1, drop_last=False)
 
 # 载入模型
 net = MyNet.MyNet()
 net.load(modelPath)
-
-if device_count() > 1 and useMultiGPU:
-    print("Find {0} devices in this machine".format(device_count()))
-    net = DataParallel(net)
 
 if is_available():
     print("gpu is available in this machine")
@@ -34,23 +24,20 @@ if is_available():
 else:
     print("can not find any gpu device on this machine, use cpu mode")
 
-correctPred = 0
-
 for i,data in enumerate(testLoader):
 
-    inputs,labels = data
+    imgName = testData.imgsAndLabels[i]
+
+    input, label = data
 
     if is_available():
-        inputs = Variable(inputs.cuda())
-        labels = Variable(labels.cuda())
+        input = Variable(input.cuda())
+        label = Variable(label.cuda())
     else:
-        inputs = Variable(inputs)
-        labels = Variable(labels)
+        input = Variable(input)
+        label = Variable(label)
 
-    outputs = net(inputs)
+    outputs = net(input)
     _, pred = torch.max(outputs, 1)
 
-    result = sum(pred==labels).numpy()
-    correctPred += result
-
-valAccu = correctPred/testNum
+    print("input:{imgName}, result:{pred}".format(imgName=imgName, pred=pred))
