@@ -110,7 +110,8 @@ class Bottleneck(nn.Module):
 # block表示用基础的残差模块还是bottleneck,如果用残差模块，传入BasicBlock(...),
 # 如果用bottleneck, 传入Bottleneck(...)
 # 4个layer的channel分别为64-128-256-512
-
+# feature map变化为 开始7*7卷积的s=2，再maxpool的s=2，4个layer其中3个的s=2， 最后一层7*7卷积后通过fc
+# 故size变化为 224 / (5*2) / 7, 即224->112->56->28->14->7->1
 class ResNet(nn.Module):
     def __init__(self, block, layers, num_classes=1000):
 
