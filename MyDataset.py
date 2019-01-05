@@ -4,7 +4,8 @@
 # In[1]:
 
 from PIL import Image
-from torch.utils.data import Dataset, DataLoader
+import torch
+from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 import cv2
 import numpy as np
@@ -71,6 +72,7 @@ class MyDataset(Dataset):
 
             if dataset == 'train':
                 trainTransforms = transforms.Compose([
+                    transforms.Resize((img_h,img_w)),
                     transforms.RandomHorizontalFlip(p=0.5),
                     transforms.RandomVerticalFlip(p=0.5),
                     transforms.ToTensor(),
@@ -80,8 +82,9 @@ class MyDataset(Dataset):
 
             if dataset == 'test' or dataset == 'valid':
                 validTransforms = transforms.Compose([
+                    transforms.Resize((img_h, img_w)),
                     transforms.ToTensor(),
-                    transforms.Normalize(self.means,self.stdevs)
+                    transforms.Normalize(torch.Tensor(self.means),torch.Tensor(self.stdevs))
                 ])
                 return validTransforms
 
@@ -89,6 +92,7 @@ class MyDataset(Dataset):
 
             if dataset == 'train':
                 trainTransforms = transforms.Compose([
+                    transforms.Resize((img_h, img_w)),
                     transforms.RandomHorizontalFlip(p=0.5),
                     transforms.RandomVerticalFlip(p=0.5),
                     transforms.ToTensor()
@@ -97,6 +101,7 @@ class MyDataset(Dataset):
 
             if dataset == 'test' or dataset == 'valid':
                 validTransforms = transforms.Compose([
+                    transforms.Resize((img_h, img_w)),
                     transforms.ToTensor()
                 ])
                 return validTransforms

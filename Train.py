@@ -17,17 +17,17 @@ from torch.autograd import Variable
 
 # In[2]:
 #模型参数设置
-epoches = 10
+epoches = 20
 batchSize = 8
 baseLR = 0.01
 
 useReduceLR = True
-usePretrainedModel = False
+usePretrainedModel = True
 saveDir = './model'
 
 # 如果usePretrainedModel = True， 则需使用该路径导入模型参数，该路径应导向一个pkl文件
 if usePretrainedModel:
-    modelPath = '...'
+    modelPath = './model/epoch-7-valAccu-0.5.pkl'
 
 # 训练数据
 trainTxtPath = './data/train.txt'
@@ -43,12 +43,14 @@ validLoader = DataLoader(validData, batch_size=batchSize, shuffle=True, num_work
 valNum = validData.__len__()
 
 
-# 创建模型自动判断是否具有多GPU环境，如果有，默认使用所有GPU
+# 创建模型,定义优化器.自动判断是否具有多GPU环境，如果有，默认使用所有GPU
 # 如果有预训练模型，则载入参数，否则用网络中定义的初始化函数初始化变量
+
 net = MyNet.MyNet()
+optimizer = SGD(net.parameters(), lr=baseLR)
 
 if usePretrainedModel:
-    net.load(modelPath)
+    net.load_state_dict(torch.load(modelPath))
 else:
     net.initialize_weights()
 
@@ -63,8 +65,7 @@ else:
     print("can not find any gpu device on this machine, use cpu mode")
 
 
-# 定义优化器与损失函数，如果使用学习率减少策略，则定义相关的类
-optimizer = SGD(net.parameters(), lr=baseLR)
+# 如果使用学习率减少策略，则定义相关的类
 
 if useReduceLR:
     lrScheduler = ReduceLROnPlateau(optimizer,mode="max",factor=0.8, patience=50, verbose=True,cooldown=10,min_lr=baseLR*0.00001)
@@ -73,7 +74,7 @@ lossFunc = CrossEntropyLoss()
 
 
 # 开始训练
-maxValAcc = 0
+maxValAccu = 0
 for epoch in range(epoches):
     
     lossSum = 0
@@ -126,13 +127,12 @@ for epoch in range(epoches):
         result = sum(vpred==vlabels).numpy()
         correctPred += result
 
-    valAccu = correctPred/valNum
+    valAccu = round(correctPred/valNum,4)
     
     # 当验证集有提升时保存模型参数为pkl文件，注意这里保存参数同时还保存了优化器参数+epoch数目
     if valAccu>maxValAccu:
         maxValAccu = valAccu
-        state = {'net':net.state_dict(), 'optimizer':optimizer.state_dict(), 'epoch':epoch }
-        torch.save(state, os.path.join(saveDir, str(epoch)+str(valAccu)+'.pkl'))
+        torch.save(net.state_dict(), os.path.join(saveDir, "epoch-"+str(epoch)+'-'+"valAccu-"+str(valAccu)+'.pkl'))
                  
 
     if useReduceLR:

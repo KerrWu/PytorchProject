@@ -7,13 +7,15 @@ import os
 import argparse
 import sys
 
-CLASSNAME = [
-'basal-cell-carcinoma',
-'lupus-erythematosus',
-'rosacea',
-'seborrheic-keratosis',
-'solar-keratosis',
-'squamous-carcinoma']
+# CLASSNAME = [
+# 'basal-cell-carcinoma',
+# 'lupus-erythematosus',
+# 'rosacea',
+# 'seborrheic-keratosis',
+# 'solar-keratosis',
+# 'squamous-carcinoma']
+
+CLASSNAME = ['car', 'cow', 'human','zebra','airplane']
 
 
 # In[2]:
