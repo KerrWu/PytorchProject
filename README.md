@@ -2,9 +2,9 @@
 
 **生成txt.py**
 
-传入参数dataset为 train/valid/test 中的一个，读取./data/dataset/下文件，不同类别的文件放入不同文件夹中，文件夹名即类别名
+传入参数`dataset`取值为 `train/valid/test` 中的一个，读取`./data/dataset/`下文件，不同类别的文件放入不同文件夹中，文件夹名即类别名
 
-在./data目录下生成 dataset.txt文件，其内包含了所有数据，其格式为
+在`./data`目录下生成` dataset.txt`文件，其内包含了所有数据，其格式为
 
 ```
 ./data/test/car/000000000001.jpg 0
@@ -27,21 +27,21 @@
 
 **MyDataset.py**
 
-由生成的txt文件创建Dataset类，其中包含了数据预处理
+由生成的txt文件创建`Dataset`类，其中包含了数据预处理
 
-按Pytorch的要求继承Dataset类并重写\__getitem\___和 \_\_len\_\_
+按Pytorch的要求继承Dataset类并重写`__getitem___`和` __len__`
 
-transform：是否进行预处理
+`transform`：是否进行预处理
 
-targetTransfom：数据预处理方式，train/valid/test
+`targetTransfom`：数据预处理方式，`train/valid/test`
 
-NORM：预处理采用标准化还是归一化
+`NORM`：预处理采用标准化还是归一化
 
 
 
 **MyNet**
 
-创建网络结构，Pytorch要求继承nn.Module并重写forward
+创建网络结构，Pytorch要求继承`nn.Module`并重写`forward`
 
 以Resnet作为例子
 
@@ -49,7 +49,7 @@ NORM：预处理采用标准化还是归一化
 
 **Train.py**
 
-训练，如果检测到GPU自动使用，且如果有多块GPU则将模型替换为DataParallel
+训练，如果检测到GPU自动使用，且如果有多块GPU则将模型替换为`DataParallel`
 
 
 
